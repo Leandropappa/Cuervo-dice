@@ -374,8 +374,8 @@ label.field-label{font-size:14px;color:#e0bd7c;letter-spacing:.04em}
 <h2>✧ Añadir dados</h2><p class="section-note">Combiná distintos tipos de dados en una misma tirada.</p>
 <div class="dice-grid" id="diceGrid"></div>
 <div class="positional-mode">
-<label><input id="d66Mode" type="checkbox"><span>✧ Tirada posicional 2d6</span></label>
-<div class="small-note">Un d6 indica la decena y el otro la unidad. Ejemplo: 3 y 5 = 35. No se suman ni usan modificador o ventaja.</div>
+<label><input id="d66Mode" type="checkbox"><span>✧ Tirada posicional de 2 dados</span></label>
+<div class="small-note">Elegí exactamente dos dados del mismo tipo (2d4, 2d6, 2d8, etc.). El primero ocupa la primera posición y el segundo la siguiente: por ejemplo, 2 y 3 = 23. No se suman ni usan modificador o ventaja.</div>
 </div>
 <div class="controls">
 <div><label class="field-label">Modificador final</label><div class="mod-controls"><button id="modMinus" type="button" aria-label="Restar uno">−</button><output id="modValue">+0</output><button id="modPlus" type="button" aria-label="Sumar uno">+</button></div></div>
@@ -455,22 +455,27 @@ function renderHistory(){
 }
 function rollPositional(){
  try{
-  const tens=secureDie(6),units=secureDie(6),total=""+tens+units;
+  const selected=sides.filter(s=>counts[s]>0);
+  if(selected.length!==1||counts[selected[0]]!==2){
+   alert("Para una tirada posicional, elegí exactamente dos dados del mismo tipo (por ejemplo, 2d4 o 2d8) y ningún otro dado.");
+   return;
+  }
+  const die=selected[0],first=secureDie(die),second=secureDie(die),total=""+first+second;
   const result=$("resultDice");result.innerHTML="";
-  [{value:tens,label:"Decena"},{value:units,label:"Unidad"}].forEach((r,i)=>{
+  [{value:first,label:"Primera posición"},{value:second,label:"Segunda posición"}].forEach((r,i)=>{
    const item=document.createElement("div");item.className="result-item";
    const visual=document.createElement("div");visual.className="result-shape";
-   const shape=document.createElement("div");shape.className="shape d6";shape.textContent=r.value;
-   visual.append(shape);const caption=document.createElement("small");caption.textContent="d6 · "+r.label;
+   const shape=document.createElement("div");shape.className="shape "+shapeClass(die);shape.textContent=r.value;
+   visual.append(shape);const caption=document.createElement("small");caption.textContent="d"+die+" · "+r.label;
    item.append(visual,caption);result.append(item);
    if(i===0){const separator=document.createElement("div");separator.className="plus";separator.textContent="·";result.append(separator)}
   });
-  const note=$("note").value.trim(),label=note||"Tirada 2d6 posicional";
+  const note=$("note").value.trim(),formula="2d"+die+" posicional",label=note||formula;
   $("total").textContent=total;
-  $("summary").textContent="Decena: "+tens+" · Unidad: "+units+" · Rango 11–66";
+  $("summary").textContent="Primer dado: "+first+" · Segundo dado: "+second+" · No se suman";
   $("result").classList.add("show");
-  lastText="Cuervo Dice Engine | "+label+"\n2d6 posicional (decena / unidad)\nDecena (d6): "+tens+"\nUnidad (d6): "+units+"\nRESULTADO: "+total;
-  const items=readHistory();items.unshift({label,detail:"2d6 posicional · decena "+tens+" · unidad "+units,total,at:Date.now()});saveHistory(items);renderHistory();
+  lastText="Cuervo Dice Engine | "+label+"\n"+formula+"\nPrimer dado (d"+die+"): "+first+"\nSegundo dado (d"+die+"): "+second+"\nRESULTADO: "+total;
+  const items=readHistory();items.unshift({label,detail:formula+" · posiciones "+first+" y "+second,total,at:Date.now()});saveHistory(items);renderHistory();
  }catch(e){alert(e.message)}
 }
 function roll(){
