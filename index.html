@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#100d13">
 <meta name="description" content="Cuervo Dice Engine: lanzador de dados para Las Cenizas de la Marea.">
-<title>Cuervo Dice Engine v0.3</title>
+<title>Cuervo Dice Engine v0.4</title>
 <style>
 :root{color-scheme:dark;--bg:#100d13;--panel:#19151d;--panel2:#211a25;--line:#514052;--gold:#c9a66c;--gold2:#f0d5a0;--muted:#b6a9b5;--purple:#9270a8;--red:#9b4c42;--green:#a7c68d}
 *{box-sizing:border-box}
@@ -76,11 +76,126 @@ label.field-label{display:block;color:var(--gold);font-size:13px;margin-bottom:7
 .foot{text-align:center;color:#9e8c9d;font:12px system-ui;line-height:1.6;margin:20px auto 0;max-width:700px}
 @media(max-width:760px){.layout{grid-template-columns:1fr}.dice-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.panel{padding:17px}}
 @media(max-width:420px){.shell{padding:14px 10px 30px}.raven{width:58px;height:58px;font-size:33px}.dice-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.die-shape{width:56px;height:54px}.controls{grid-template-columns:1fr}.modes span{font-size:12px}.panel{padding:15px}.total{font-size:54px}}
+
+/* v0.4 — atmósfera de fantasía oscura */
+:root{
+ --bg:#09080d;--panel:#17131b;--panel2:#211925;--line:#594454;
+ --gold:#b99a65;--gold2:#e8d2a5;--muted:#a99baa;--purple:#76517f;
+}
+body{
+ background:
+  radial-gradient(ellipse at 50% 0%,#51304a 0,transparent 36%),
+  radial-gradient(ellipse at 0% 65%,#202338 0,transparent 42%),
+  radial-gradient(ellipse at 100% 75%,#321e2c 0,transparent 38%),
+  linear-gradient(180deg,#100c14 0%,#09080d 78%);
+}
+body:before{
+ opacity:.10;
+ background-image:
+  repeating-linear-gradient(0deg,transparent 0 3px,#b99a65 4px,transparent 5px 9px),
+  repeating-linear-gradient(90deg,transparent 0 17px,#8b6b87 18px,transparent 19px 37px);
+ mask-image:linear-gradient(to bottom,#000,transparent 88%);
+}
+body:after{
+ content:"";position:fixed;inset:12px;pointer-events:none;z-index:0;
+ border:1px solid #b99a6530;box-shadow:inset 0 0 50px #0009;
+}
+.shell{max-width:1160px;padding-top:30px;z-index:1}
+header{
+ position:relative;padding:14px 12px 25px;border-bottom:1px solid #a98a5b66;
+}
+header:after{
+ content:"✦  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ✦";
+ position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
+ white-space:nowrap;color:#b99a65;font-size:11px;letter-spacing:.12em;
+ background:#100c14;padding:0 12px;
+}
+.raven{
+ width:88px;height:88px;border:1px solid #c4a46d;
+ border-radius:50%;background:
+ radial-gradient(circle at 50% 40%,#51384f 0,#211725 58%,#0d0b11 100%);
+ box-shadow:0 0 0 5px #b99a6512,0 0 30px #9c628a45,inset 0 0 18px #000;
+ font-size:48px;position:relative;
+}
+.raven:after{content:"";position:absolute;inset:6px;border:1px solid #c9a66c55;border-radius:50%}
+.kicker{color:#c6a66d;letter-spacing:.3em}
+h1{font-size:clamp(29px,5.4vw,46px);letter-spacing:.07em;text-shadow:0 2px 3px #000,0 0 24px #b47a9b55}
+.subtitle{color:#c0adbd;letter-spacing:.025em}
+.layout{gap:22px;margin-top:27px}
+.panel{
+ background:
+  radial-gradient(ellipse at 50% 0%,#39283b55,transparent 55%),
+  linear-gradient(145deg,#211925f7,#100e15fa 75%);
+ border:1px solid #765c70;border-radius:2px;
+ box-shadow:0 18px 48px #000b,inset 0 0 0 1px #d2b27b12,inset 0 0 35px #0005;
+}
+.panel:before,.panel:after{font-size:15px;color:#d0ae72;text-shadow:0 0 9px #c49a5a}
+h2{font-size:21px;color:#ead5aa;text-shadow:0 1px 10px #c29a5b33}
+.section-note{color:#b6a5b5}
+.die-pick{
+ background:linear-gradient(160deg,#211a27,#0d0b11);
+ border:1px solid #665064;border-radius:2px;
+ box-shadow:inset 0 0 18px #0008,0 5px 12px #0004;
+ transition:border-color .18s,transform .18s,box-shadow .18s;
+}
+.die-pick:hover{border-color:#c5a36d;transform:translateY(-2px);box-shadow:0 7px 18px #0008,0 0 13px #a77b9b25}
+.die-name{color:#e0cba4;text-shadow:0 1px 8px #c5a36d44}
+.die-shape,.result-shape{filter:drop-shadow(0 5px 8px #000d) drop-shadow(0 0 5px #b28a5a22)}
+.shape{border:1px solid #e7c99455;text-shadow:0 2px 5px #000,0 0 8px #fff5}
+.d4{--die-color:#765078;--die-hi:#c49bc4;--die-low:#24152c}
+.d6{--die-color:#345b77;--die-hi:#88b1c8;--die-low:#101d31}
+.d8{--die-color:#4c6947;--die-hi:#a9bd7d;--die-low:#1c2a20}
+.d10{--die-color:#93603a;--die-hi:#d5a76b;--die-low:#392018}
+.d12{--die-color:#826044;--die-hi:#d5b17a;--die-low:#302018}
+.d20{--die-color:#873d4c;--die-hi:#d88783;--die-low:#2b101e}
+.d100{--die-color:#786943;--die-hi:#d2c18b;--die-low:#292316}
+.counter button,.mod-controls button{
+ background:linear-gradient(180deg,#49364b,#211925);border-color:#8b6d83;color:#f0d9a9;
+ box-shadow:inset 0 1px #ffffff19,0 2px 5px #0008;
+}
+.counter button:hover,.mod-controls button:hover{border-color:#d2b477;background:#5b4059}
+.counter output{color:#f2e3c5}
+.controls{border-top:1px solid #71586c}
+label.field-label{color:#d0b17b}
+.mode span{background:#110e15;border-color:#665064}
+.mode input:checked+span{
+ background:linear-gradient(135deg,#50364f,#2d2033);
+ border-color:#c4a36d;color:#ffe7b8;box-shadow:inset 0 0 12px #c49b5a22,0 0 10px #a8759b22;
+}
+.note-input{background:#0c0a10;border-color:#665064;color:#f4e8d4}
+.note-input:focus{outline:1px solid #c4a36d;box-shadow:0 0 12px #a8799b33}
+.primary{
+ background:linear-gradient(105deg,#2b1c30,#70415b 48%,#321e2e);
+ border:1px solid #c7a66d;color:#f5dfb5;
+ box-shadow:inset 0 1px #ffffff20,0 7px 22px #0009,0 0 18px #a06b8a25;
+ text-shadow:0 1px 3px #000;transition:filter .2s,box-shadow .2s;
+}
+.primary:hover{filter:brightness(1.18);box-shadow:inset 0 1px #ffffff30,0 8px 25px #000b,0 0 22px #b27b9b44}
+.small-note{color:#a99baa}
+.result-head,.total-label{color:#d2b477}
+.result-dice{padding:10px 0}
+.total{color:#f0d9a7;text-shadow:0 0 12px #c69b5b88,0 0 34px #9b628455}
+.total-wrap{border-top:1px solid #765c70}
+.secondary,.danger{
+ background:linear-gradient(180deg,#302437,#17121d);border-color:#765c70;color:#ead7b8;
+}
+.secondary:hover,.danger:hover{border-color:#c4a36d;background:#49344a}
+.entry{border-bottom-color:#4e3c50}
+.entry-title{color:#e7d5bb}
+.entry strong{color:#edcf91;text-shadow:0 0 10px #bd945744}
+.empty,.foot{color:#aa9bad}
+.foot{letter-spacing:.08em}
+@media(max-width:420px){
+ body:after{inset:5px}
+ header{padding-left:4px;padding-right:4px}
+ .raven{width:64px;height:64px;font-size:36px}
+}
+
 </style>
 </head>
 <body>
 <div class="shell">
-<header><div class="raven" aria-hidden="true">🐦‍⬛</div><div><div class="kicker">Las Cenizas de la Marea</div><h1>Cuervo Dice Engine</h1><div class="subtitle">El cuervo observa. El azar decide. · v0.3</div></div></header>
+<header><div class="raven" aria-hidden="true">🐦‍⬛</div><div><div class="kicker">Las Cenizas de la Marea</div><h1>Cuervo Dice Engine</h1><div class="subtitle">El cuervo observa. El azar decide. · v0.4</div></div></header>
 <div class="layout">
 <div>
 <section class="panel">
@@ -109,7 +224,7 @@ label.field-label{display:block;color:var(--gold);font-size:13px;margin-bottom:7
 <section class="panel" style="margin-top:18px"><h2>✧ El código del azar</h2><div class="small-note">Cada dado se genera con aleatoriedad criptográfica del navegador. Las tiradas y el historial se guardan únicamente en este dispositivo; no se envían a GitHub ni a ChatGPT.</div></section>
 </aside>
 </div>
-<p class="foot">CUERVO DICE ENGINE v0.3 · Forjado para grandes historias · Las Cenizas de la Marea</p>
+<p class="foot">CUERVO DICE ENGINE v0.4 · Forjado para grandes historias · Las Cenizas de la Marea</p>
 </div>
 <script>
 (function(){
