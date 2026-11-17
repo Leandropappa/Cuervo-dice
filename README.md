@@ -1,4 +1,4 @@
-# Cuervo Dice Engine v0.2
+# Cuervo Dice Engine v0.4
 
 Lanzador de dados para la campaña **Las Cenizas de la Marea**.
 
@@ -10,7 +10,8 @@ Lanzador de dados para la campaña **Las Cenizas de la Marea**.
 - Ventaja y desventaja para exactamente 1d20: lanza dos d20 y conserva el mayor o el menor.
 - Resultados individuales representados dentro de la silueta de cada dado.
 - Total final destacado, botón para copiar el resultado e historial local de hasta 40 tiradas.
-- Interfaz de fantasía oscura, adaptable a móviles y computadoras.
+- Interfaz de fantasía oscura gótica, con ambientación, detalles ornamentales y paleta de oro envejecido, púrpura y carmesí.
+- Diseño adaptable a móviles y computadoras.
 
 Ejemplo: **1d4 + 1d6 + 3**, útil para daño de daga más Ataque Furtivo.
 
