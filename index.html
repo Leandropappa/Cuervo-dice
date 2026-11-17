@@ -174,8 +174,9 @@ function roll(){
   });
   if(m!=="normal"){
    const a=secureDie(20),b=secureDie(20),chosen=m==="advantage"?Math.max(a,b):Math.min(a,b);
-   rolls.push({sides:20,value:a,kept:a===chosen},{sides:20,value:b,kept:b===chosen});
-   if(a===b){rolls[0].kept=true;rolls[1].kept=false}
+   const firstD20={sides:20,value:a,kept:a===chosen},secondD20={sides:20,value:b,kept:b===chosen};
+   rolls.push(firstD20,secondD20);
+   if(a===b){firstD20.kept=true;secondD20.kept=false}
    subtotal+=chosen;keptValue=chosen;
   }
   const total=subtotal+modifier;
