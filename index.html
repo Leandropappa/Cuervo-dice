@@ -150,7 +150,7 @@ function secureDie(s){
  do{crypto.getRandomValues(buf);n=buf[0]}while(n>=limit);
  return n%s+1;
 }
-function readHistory(){try{return JSON.parse(localStorage.getItem(storageKey)||"[]")}catch(e){return []}}
+function readHistory(){try{const current=localStorage.getItem(storageKey);if(current!==null)return JSON.parse(current);const legacy=JSON.parse(localStorage.getItem("cuervo-dice-history-v1")||"[]");if(legacy.length)localStorage.setItem(storageKey,JSON.stringify(legacy.slice(0,40)));return legacy}catch(e){return []}}
 function saveHistory(items){localStorage.setItem(storageKey,JSON.stringify(items.slice(0,40)))}
 function renderHistory(){
  const box=$("history");box.innerHTML="";const items=readHistory();
