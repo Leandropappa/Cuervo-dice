@@ -45,6 +45,12 @@ h2{margin:0 0 16px;color:var(--gold2);font-size:20px;font-weight:normal;letter-s
 .counter button,.mod-controls button{width:30px;height:29px;padding:0;border:1px solid #68536b;background:#2b2130;color:var(--gold2);border-radius:3px;font-size:18px}
 .counter output{min-width:20px;font:18px system-ui;color:#fff}
 .controls{display:grid;grid-template-columns:1fr 1.5fr;gap:16px;margin-top:18px;padding-top:17px;border-top:1px solid #59465a}
+.positional-mode{margin-top:18px;padding:14px 15px;border:1px solid #98764f;background:linear-gradient(135deg,#302236,#120e17);box-shadow:inset 0 0 18px #0008}
+.positional-mode label{display:flex;align-items:center;gap:10px;color:#f0d9aa;font-size:16px;cursor:pointer}
+.positional-mode input{accent-color:#c9a66c;width:18px;height:18px}
+.positional-mode .small-note{margin:8px 0 0 28px}
+.positional-mode:has(input:checked){border-color:#e0bd7c;box-shadow:inset 0 0 18px #c9a66c22,0 0 15px #a06b8a22}
+
 label.field-label{display:block;color:var(--gold);font-size:13px;margin-bottom:7px}
 .mod-controls{display:flex;align-items:center;gap:8px}
 .mod-controls output{min-width:60px;text-align:center;font:22px system-ui;color:var(--gold2)}
@@ -367,6 +373,10 @@ label.field-label{font-size:14px;color:#e0bd7c;letter-spacing:.04em}
 <section class="panel">
 <h2>✧ Añadir dados</h2><p class="section-note">Combiná distintos tipos de dados en una misma tirada.</p>
 <div class="dice-grid" id="diceGrid"></div>
+<div class="positional-mode">
+<label><input id="d66Mode" type="checkbox"><span>✧ Tirada posicional 2d6</span></label>
+<div class="small-note">Un d6 indica la decena y el otro la unidad. Ejemplo: 3 y 5 = 35. No se suman ni usan modificador o ventaja.</div>
+</div>
 <div class="controls">
 <div><label class="field-label">Modificador final</label><div class="mod-controls"><button id="modMinus" type="button" aria-label="Restar uno">−</button><output id="modValue">+0</output><button id="modPlus" type="button" aria-label="Sumar uno">+</button></div></div>
 <div><label class="field-label">Ventaja / desventaja (requiere 1d20)</label><div class="modes">
@@ -443,7 +453,28 @@ function renderHistory(){
   const total=document.createElement("strong");total.textContent=item.total;row.append(left,total);box.append(row);
  });
 }
+function rollPositional(){
+ try{
+  const tens=secureDie(6),units=secureDie(6),total=""+tens+units;
+  const result=$("resultDice");result.innerHTML="";
+  [{value:tens,label:"Decena"},{value:units,label:"Unidad"}].forEach((r,i)=>{
+   const item=document.createElement("div");item.className="result-item";
+   const visual=document.createElement("div");visual.className="result-shape";
+   const shape=document.createElement("div");shape.className="shape d6";shape.textContent=r.value;
+   visual.append(shape);const caption=document.createElement("small");caption.textContent="d6 · "+r.label;
+   item.append(visual,caption);result.append(item);
+   if(i===0){const separator=document.createElement("div");separator.className="plus";separator.textContent="·";result.append(separator)}
+  });
+  const note=$("note").value.trim(),label=note||"Tirada 2d6 posicional";
+  $("total").textContent=total;
+  $("summary").textContent="Decena: "+tens+" · Unidad: "+units+" · Rango 11–66";
+  $("result").classList.add("show");
+  lastText="Cuervo Dice Engine | "+label+"\n2d6 posicional (decena / unidad)\nDecena (d6): "+tens+"\nUnidad (d6): "+units+"\nRESULTADO: "+total;
+  const items=readHistory();items.unshift({label,detail:"2d6 posicional · decena "+tens+" · unidad "+units,total,at:Date.now()});saveHistory(items);renderHistory();
+ }catch(e){alert(e.message)}
+}
 function roll(){
+ if($("d66Mode").checked){rollPositional();return}
  const count=totalDice(),m=selectedMode();
  if(count<1){alert("Elegí al menos un dado.");return}
  if(m!=="normal"&&counts[20]!==1){alert("Para usar ventaja o desventaja, agregá exactamente un d20. Los demás dados pueden combinarse libremente.");return}
