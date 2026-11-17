@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#100d13">
 <meta name="description" content="Cuervo Dice Engine: lanzador de dados para Las Cenizas de la Marea.">
-<title>Cuervo Dice Engine v0.2</title>
+<title>Cuervo Dice Engine v0.3</title>
 <style>
 :root{color-scheme:dark;--bg:#100d13;--panel:#19151d;--panel2:#211a25;--line:#514052;--gold:#c9a66c;--gold2:#f0d5a0;--muted:#b6a9b5;--purple:#9270a8;--red:#9b4c42;--green:#a7c68d}
 *{box-sizing:border-box}
@@ -80,7 +80,7 @@ label.field-label{display:block;color:var(--gold);font-size:13px;margin-bottom:7
 </head>
 <body>
 <div class="shell">
-<header><div class="raven" aria-hidden="true">🐦‍⬛</div><div><div class="kicker">Las Cenizas de la Marea</div><h1>Cuervo Dice Engine</h1><div class="subtitle">El cuervo observa. El azar decide. · v0.2</div></div></header>
+<header><div class="raven" aria-hidden="true">🐦‍⬛</div><div><div class="kicker">Las Cenizas de la Marea</div><h1>Cuervo Dice Engine</h1><div class="subtitle">El cuervo observa. El azar decide. · v0.3</div></div></header>
 <div class="layout">
 <div>
 <section class="panel">
@@ -88,14 +88,14 @@ label.field-label{display:block;color:var(--gold);font-size:13px;margin-bottom:7
 <div class="dice-grid" id="diceGrid"></div>
 <div class="controls">
 <div><label class="field-label">Modificador final</label><div class="mod-controls"><button id="modMinus" type="button" aria-label="Restar uno">−</button><output id="modValue">+0</output><button id="modPlus" type="button" aria-label="Sumar uno">+</button></div></div>
-<div><label class="field-label">Ventaja / desventaja (solo 1d20)</label><div class="modes">
+<div><label class="field-label">Ventaja / desventaja (requiere 1d20)</label><div class="modes">
 <label class="mode"><input type="radio" name="mode" value="normal" checked><span>Normal</span></label>
 <label class="mode"><input type="radio" name="mode" value="advantage"><span>Ventaja</span></label>
 <label class="mode"><input type="radio" name="mode" value="disadvantage"><span>Desventaja</span></label>
 </div></div></div>
 <input class="note-input" id="note" maxlength="80" placeholder="Motivo de la tirada (opcional), ej. Daga + ataque furtivo">
 <button class="primary" id="roll" type="button">⚔　Tirar dados</button>
-<div class="small-note">Máximo 20 dados por tirada. Ventaja y desventaja requieren exactamente un d20 y ningún otro dado.</div>
+<div class="small-note">Máximo 20 dados por tirada. Ventaja y desventaja duplican únicamente el d20; los demás dados se tiran una vez.</div>
 </section>
 <section class="panel result" id="result" aria-live="polite">
 <div class="result-head">✧ Resultado de la tirada ✧</div>
@@ -109,7 +109,7 @@ label.field-label{display:block;color:var(--gold);font-size:13px;margin-bottom:7
 <section class="panel" style="margin-top:18px"><h2>✧ El código del azar</h2><div class="small-note">Cada dado se genera con aleatoriedad criptográfica del navegador. Las tiradas y el historial se guardan únicamente en este dispositivo; no se envían a GitHub ni a ChatGPT.</div></section>
 </aside>
 </div>
-<p class="foot">CUERVO DICE ENGINE v0.2 · Forjado para grandes historias · Las Cenizas de la Marea</p>
+<p class="foot">CUERVO DICE ENGINE v0.3 · Forjado para grandes historias · Las Cenizas de la Marea</p>
 </div>
 <script>
 (function(){
@@ -140,7 +140,7 @@ function setCount(s,n){
  n=Math.max(0,Math.min(20,n));
  if(totalDice()-counts[s]+n>20){alert("El máximo es de 20 dados por tirada.");return}
  counts[s]=n;$("count"+s).textContent=n;
- if(n!==1||s!==20){const current=document.querySelector('input[name="mode"]:checked').value;if(current!=="normal")document.querySelector('input[name="mode"][value="normal"]').checked=true}
+ if(s===20&&n!==1){const current=document.querySelector('input[name="mode"]:checked').value;if(current!=="normal")document.querySelector('input[name="mode"][value="normal"]').checked=true}
 }
 function setModifier(n){modifier=Math.max(-999,Math.min(999,n));$("modValue").textContent=(modifier>0?"+":"")+modifier}
 function selectedMode(){return document.querySelector('input[name="mode"]:checked').value}
@@ -165,20 +165,21 @@ function renderHistory(){
 function roll(){
  const count=totalDice(),m=selectedMode();
  if(count<1){alert("Elegí al menos un dado.");return}
- if(m!=="normal"&&(counts[20]!==1||count!==1)){alert("Ventaja y desventaja requieren exactamente un d20 y ningún otro dado.");return}
+ if(m!=="normal"&&counts[20]!==1){alert("Para usar ventaja o desventaja, agregá exactamente un d20. Los demás dados pueden combinarse libremente.");return}
  try{
   const rolls=[];let subtotal=0,keptValue=null;
   sides.forEach(s=>{
+   if(s===20&&m!=="normal")return;
    for(let i=0;i<counts[s];i++){const value=secureDie(s);rolls.push({sides:s,value,kept:true});subtotal+=value}
   });
   if(m!=="normal"){
    const a=secureDie(20),b=secureDie(20),chosen=m==="advantage"?Math.max(a,b):Math.min(a,b);
-   rolls.length=0;rolls.push({sides:20,value:a,kept:a===chosen&&!(a===b&&false)},{sides:20,value:b,kept:b===chosen});
+   rolls.push({sides:20,value:a,kept:a===chosen},{sides:20,value:b,kept:b===chosen});
    if(a===b){rolls[0].kept=true;rolls[1].kept=false}
-   subtotal=chosen;keptValue=chosen;
+   subtotal+=chosen;keptValue=chosen;
   }
   const total=subtotal+modifier;
-  const formula=sides.filter(s=>counts[s]>0).map(s=>counts[s]+"d"+s).join(" + ")+(modifier?(modifier>0?" + ":" − ")+Math.abs(modifier):"");
+  const formula=sides.filter(s=>counts[s]>0).map(s=>(m!=="normal"&&s===20?2:counts[s])+"d"+s).join(" + ")+(modifier?(modifier>0?" + ":" − ")+Math.abs(modifier):"");
   const modeText={normal:"Normal",advantage:"Ventaja",disadvantage:"Desventaja"}[m];
   const note=$("note").value.trim(),label=note||formula;
   const result=$("resultDice");result.innerHTML="";
@@ -204,7 +205,7 @@ $("modPlus").addEventListener("click",()=>setModifier(modifier+1));
 $("roll").addEventListener("click",roll);$("again").addEventListener("click",roll);
 $("copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(lastText);$("copy").textContent="¡Copiado!";setTimeout(()=>$("copy").textContent="▣ Copiar resultado",1300)}catch(e){alert("No se pudo acceder al portapapeles. Podés copiar el texto manualmente.")}});
 $("clear").addEventListener("click",()=>{if(confirm("¿Borrar el historial guardado en este dispositivo?")){saveHistory([]);renderHistory()}});
-document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener("change",()=>{if(el.value!=="normal"&&el.checked){sides.forEach(s=>{counts[s]=0;if($("count"+s))$("count"+s).textContent="0"});setCount(20,1)}}));
+document.querySelectorAll('input[name="mode"]').forEach(el=>el.addEventListener("change",()=>{if(el.value!=="normal"&&el.checked&&counts[20]!==1){alert("Agregá exactamente un d20 para activar ventaja o desventaja.");document.querySelector('input[name="mode"][value="normal"]').checked=true}}));
 buildDice();setModifier(0);renderHistory();
 })();
 </script>
